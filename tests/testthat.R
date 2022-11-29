@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/reference/test_package.html#special-files
 
 library(testthat)
-library(SumProduct)
+library(SumProductVE)
 
-test_check("SumProduct")
+test_check("SumProductVE")

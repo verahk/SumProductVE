@@ -11,7 +11,9 @@
 #' @export
 #'
 factor_product <- function(x, y){
-
+  if (length(x) == 1 || length(y) == 1){
+    return(x*y)
+  }
   # find common vars
   vars_x  <- names(dimnames(x))
   vars_y  <- names(dimnames(y))

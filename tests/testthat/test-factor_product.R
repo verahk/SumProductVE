@@ -1,6 +1,6 @@
 test_that("function returns correct product", {
 
-  levels <- list(x = 0:3, y = 0:1, z = 0:4)
+  levels <- list(x = 0:3, y = 0:3, z = 0:4)
   k <- lengths(levels)
 
   u <- rgamma(prod(k), rep(1, prod(k)))
@@ -27,5 +27,6 @@ test_that("function returns correct product", {
   expect_equal(Reduce(factor_product, list(px, py.x, pz.xy)), count/N, ignore_attr = TRUE)
   expect_equal(Reduce(factor_product, rev(list(px, py.x, pz.xy))), count/N, ignore_attr = TRUE)
   expect_equal(Reduce(factor_product, rev(list(py.x, px, pz.xy))), count/N, ignore_attr = TRUE)
+  expect_equal(factor_product(py.x, px), py.x*rep(px, k[2]), ignore_attr = TRUE)
 })
 

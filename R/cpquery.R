@@ -1,8 +1,8 @@
 
-#' Exact computation of conditional probability distributions
+#' Exact inference in discrete bayesian networks
 #'
 #' Compute conditional probability distributions from a set of CPTs associated
-#' associated with a Bayesian network, using the variable elimination algorithm.
+#' with a Bayesian network, using the variable elimination algorithm.
 #'
 #' @param cpts (list) a discrete [bnlearn::bn.fit] object or a
 #'  list of [base::array]s that specifies a conditional probability table $P(X_i| Pa(X_i))$
@@ -42,7 +42,10 @@
 #' cpts <- list(z = z, x = x, y = y)
 #'
 #' # marginal prob
-#' cpquery(cpts, y = "y")
+#' cpquery(cpts, y = 3)
+#'
+#' # joint prob
+#' cpquery(cpts, y = 1:3)
 #'
 #' # conditional probs
 #' cpquery(cpts, y = "y", x = "x")
@@ -79,7 +82,8 @@ cpquery <- function(cpts, y, x = integer(0), anc = NULL) {
     dag  <- dag_from_cpts(cpts)
     anc  <- areAncestors(dag, keep)
   } else {
-    stopifnot(length(anc) == length(cpts) && all(anc[keep]))
+    # check input
+    stopifnot(class(anc) == "logical" && length(anc) == length(cpts) && all(anc[keep]))
   }
 
   cpquery_internal(cpts, y, x, anc)
@@ -94,21 +98,14 @@ cpquery_internal <- function(cpts, y, x, anc) {
   # compute marg joint prob
   pyx  <- sum_product_ve(cpts[anc], varnames[replace(anc, keep, FALSE)])
 
-  # compute conditional prob
-  if (length(keep) > 1) {
-    # permute array
-    pyx  <- aperm(pyx, varnames[keep])
+  # permute array
+  pyx  <- aperm(pyx, varnames[keep])
 
-    if (!is.null(x)) {
-      # compute cond prob p(y|x)
-      ny <- length(y)
-      ky <- prod(dim(pyx)[seq_len(ny)])
-      px <- colSums(pyx, ny)
-      pyx <- pyx/rep(px, each = ky)
-    }
-  }
+  if (length(x) == 0) return(pyx)
 
-  return(pyx)
+  # compute cond prob p(y|x)
+  px <- colSums(pyx, length(y))
+  pyx/rep(px, each = length(pyx)/length(px))
 }
 
 #' @rdname cpquery
@@ -133,7 +130,6 @@ dag_from_cpts <- function(cpts) {
 #' @rdname cpquery
 #' @param dag an adjacency matrix
 #' @param nodes column position of nodes
-#' @export
 #' @return
 #' - `areAncestors`: a n-length logical vector indicating which variables are ancestors of `nodes`
 areAncestors <- function(dag, nodes, seqn = seq_len(ncol(dag)), anc = rep(FALSE, ncol(dag))) {
@@ -150,8 +146,8 @@ areAncestors <- function(dag, nodes, seqn = seq_len(ncol(dag)), anc = rep(FALSE,
   return(anc)
 }
 
-#' @rdname cpquery
-#' @export
+#' @noRd
+#' @param bn an object of class [bnlearn::bn.fit()] representing a discrete Bayesian Network.
 cpts_from_bn <- function(bn) {
   lapply(bn, function(x) {
     if (length(x$parents) == 0) {

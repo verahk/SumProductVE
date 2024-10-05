@@ -40,6 +40,8 @@ If `NULL` (default), the ancestors is computed via the DAG implied by `cpts`.}
 \item{dag}{an adjacency matrix}
 
 \item{nodes}{column position of nodes}
+
+\item{bn}{an object of class [bnlearn::bn.fit()] representing a discrete Bayesian Network.}
 }
 \value{
 an array with `length(y, x)` dimensions, with the conditional probabilities of `y` given `x`.
@@ -47,6 +49,8 @@ an array with `length(y, x)` dimensions, with the conditional probabilities of `
 - `dag_from_cpts`: a n-by-n adjacency matrix of the DAG consistent with the scope of `cpts`
 
 - `areAncestors`: a n-length logical vector indicating which variables are ancestors of `nodes`
+
+- `cpts_from_bn`: a `n` length list with cpts.
 }
 \description{
 Compute conditional probability distributions from a set of CPTs associated

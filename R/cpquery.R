@@ -98,10 +98,10 @@ cpquery_internal <- function(cpts, y, x, anc) {
   # compute marg joint prob
   pyx  <- sum_product_ve(cpts[anc], varnames[replace(anc, keep, FALSE)])
 
+  if (length(x) == 0) return(pyx)
+
   # permute array
   pyx  <- aperm(pyx, varnames[keep])
-
-  if (length(x) == 0) return(pyx)
 
   # compute cond prob p(y|x)
   px <- colSums(pyx, length(y))
